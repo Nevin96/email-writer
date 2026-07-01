@@ -3,6 +3,8 @@ package com.email.email_writer.app;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 import java.util.Objects;
@@ -32,8 +34,25 @@ public class EmailGeneratorService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
+        return extractResponseContent(response);
     }
+
+    private String extractResponseContent(String response) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(response);
+            String text = rootNode.path("steps")
+                    .get(0)
+                    .path("content")
+                    .get(0)
+                    .path("text")
+                    .asText();
+            return text;
+        }catch (Exception e){
+            return "Error processing request: " + e.getMessage();
+        }
+    }
+
     private String BuildPrompt(EmailRequest emailRequest) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("Generate a professional email reply for the following email content.Please Don't generate a subject line ");
