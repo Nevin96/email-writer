@@ -7,33 +7,32 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class EmailGeneratorService {
 
-    private final WebClient webclient;
+    private final WebClient webclient = WebClient.builder().build();
 
     @Value("${gemini.api.url}")
     private String geminiApiUrl;
     @Value("${gemini.api.key}")
     private String geminiApikey;
 
-    public EmailGeneratorService(WebClient webclient) {
-        this.webclient = webclient;
-    }
 
     public String GenerateEmailReply(EmailRequest emailRequest){
         //build prompt
         String prompt = BuildPrompt(emailRequest);
         //craft prompt
-        Map<String, Object> requestBody = Map.of("input",prompt);
+        Map<String, Object> requestBody = Map.of("model", "gemini-3.5-flash",
+                "input",prompt);
         //get request and response
         String response = webclient.post().uri(geminiApiUrl + geminiApikey)
                 .header("Content-Type","application/json")
+                .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+        System.out.println(extractResponseContent(response));
         return extractResponseContent(response);
     }
 
@@ -41,13 +40,12 @@ public class EmailGeneratorService {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(response);
-            String text = rootNode.path("steps")
-                    .get(0)
+            return rootNode.path("steps")
+                    .get(1)
                     .path("content")
                     .get(0)
                     .path("text")
                     .asText();
-            return text;
         }catch (Exception e){
             return "Error processing request: " + e.getMessage();
         }
@@ -60,6 +58,7 @@ public class EmailGeneratorService {
             prompt.append("Use a ").append(emailRequest.getTone()).append(" tone");
         }
         prompt.append("\nOriginal email: \n").append(emailRequest.getContent());
+        System.out.println(prompt);
         return prompt.toString();
     }
 }
