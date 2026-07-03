@@ -32,7 +32,6 @@ public class EmailGeneratorService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-        System.out.println(extractResponseContent(response));
         return extractResponseContent(response);
     }
 
@@ -58,7 +57,6 @@ public class EmailGeneratorService {
             prompt.append("Use a ").append(emailRequest.getTone()).append(" tone");
         }
         prompt.append("\nOriginal email: \n").append(emailRequest.getContent());
-        System.out.println(prompt);
         return prompt.toString();
     }
 }
