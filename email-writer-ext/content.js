@@ -1,6 +1,25 @@
 console.log("Email Writer extension - content script loaded");
-function injectButton() {
+function findComposeToolbar() {
     
+}
+function createAIbutton() {
+    
+}
+function injectButton() {
+    const existingButton = node.querySelector('.ai-reply-button');
+    if (existingButton) existingButton.remove();
+
+    const toolbar = findComposeToolbar();
+    if (!toolbar){
+        console.log("toolbar not found!");
+        return;
+    }
+    console.log("toolbar found! creating AI button");
+    const button = createAIbutton();
+    button.classList.add('ai-reply-button');
+    button.addEventListener('click',async () => {
+        
+    })
 }
 const observer = new MutationObserver((mutations) => {
     for(const mutation of mutations) {
