@@ -16,16 +16,6 @@ An AI-powered email reply generator built with **Spring Boot**, **React**, and t
 
 ---
 
-## 🖼️ Demo
-
-### Web Application
-> Add screenshots or GIF here
-
-### Gmail Chrome Extension
-> Add screenshots or GIF here
-
----
-
 ## 🛠️ Tech Stack
 
 ### Backend
